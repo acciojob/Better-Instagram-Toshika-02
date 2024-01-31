@@ -2,7 +2,7 @@ let dragindex = 0;
 let dropindex = 0;
 let clone = "";
 
-const images = document.querySelectorAll(".image");
+const images = document.querySelectorAll("image");
 
 function drag(e) {
   e.dataTransfer.setData("text", e.target.id);
