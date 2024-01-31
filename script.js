@@ -1,54 +1,47 @@
+let dragindex = 0;
+let dropindex = 0;
+let clone = "";
 
-const divs = document.querySelectorAll('.image');
+const images = document.querySelectorAll(".image");
 
-        // Enhance responsiveness with grid-based layout:
-        parent.style.display = 'grid';
-        parent.style.gridTemplateColumns = 'repeat(3, 1fr)';
+function drag(e) {
+  e.dataTransfer.setData("text", e.target.id);
+}
 
-        // Add initial images (assuming image paths are in style.css):
-        for (let i = 0; i < divs.length; i++) {
-            divs[i].style.backgroundImage = `url(image${i + 1}.jpg)`;
-        }
+function allowDrop(e) {
+  e.preventDefault();
+}
 
-        // Optimized drag and drop implementation:
-        divs.forEach(div => {
-            div.addEventListener('dragstart', dragStart);
-            div.addEventListener('dragover', dragOver);
-            div.addEventListener('drop', drop);
-        });
+function drop(e) {
+  clone = e.target.cloneNode(true);
+  let data = e.dataTransfer.getData("text");
+  let nodelist = document.getElementById("parent").childNodes;
+  console.log(data, e.target.id);
+  for (let i = 0; i < nodelist.length; i++) {
+    if (nodelist[i].id == data) {
+      dragindex = i;
+    }
+  }
 
-        function dragStart(event) {
-            event.dataTransfer.setData('text/plain', event.target.id);
-            event.target.classList.add('dragging');
-        }
+  dragdrop(clone);
 
-        function dragOver(event) {
-            event.preventDefault(); // Allow drop
-            if (event.target !== event.currentTarget) {
-                event.target.classList.add('drop-over');
-            }
-        }
+  document
+    .getElementById("parent")
+    .replaceChild(document.getElementById(data), e.target);
 
-        function drop(event) {
-            event.preventDefault();
-            const draggedId = event.dataTransfer.getData('text/plain');
-            const draggedElement = document.getElementById(draggedId);
-            const dropZone = event.target;
+  document
+    .getElementById("parent")
+    .insertBefore(
+      clone,
+      document.getElementById("parent").childNodes[dragindex]
+    );
+}
 
-            if (draggedElement !== dropZone) {
-                // Perform element swap:
-                draggedElement.parentNode.insertBefore(dropZone, draggedElement);
-                dropZone.parentNode.insertBefore(draggedElement, dropZone);
+const dragdrop = (image) => {
+  image.ondragstart = drag;
+  image.ondragover = allowDrop;
+  image.ondrop = drop;
+};
 
-                // Swap background images (assuming they're set using 'url()'):
-                const tempImage = draggedElement.style.backgroundImage;
-                draggedElement.style.backgroundImage = dropZone.style.backgroundImage;
-                dropZone.style.backgroundImage = tempImage;
-            }
-
-            // Clear visual feedback:
-            draggedElement.classList.remove('dragging');
-            dropZone.classList.remove('drop-over');
-        }
-
+images.forEach(dragdrop);
 
